@@ -29,3 +29,7 @@ build/
 
 ### VS Code ###
 .vscode/
+generatorConfig.xml
+application.properties
+jdbc.properties
+generatorConfig.xml
