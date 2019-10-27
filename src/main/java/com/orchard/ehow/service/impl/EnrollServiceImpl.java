@@ -1,6 +1,7 @@
 package com.orchard.ehow.service.impl;
 
 import com.orchard.ehow.dao.EnrollEnrollsinfo;
+import com.orchard.ehow.dao.EnrollEnrollsinfoExample;
 import com.orchard.ehow.dao.EnrollProject;
 import com.orchard.ehow.dao.EnrollProjectExample;
 import com.orchard.ehow.mapper.EnrollEnrollsinfoMapper;
@@ -31,5 +32,13 @@ public class EnrollServiceImpl implements EnrollService {
     public List<EnrollProject> getAllProjects() {
         EnrollProjectExample example = new EnrollProjectExample();
         return enrollProjectMapper.selectByExample(example);
+    }
+
+
+    @Override
+    public List<EnrollEnrollsinfo> getEnrollEnrollsinfoByProjectCode(String projectCode) {
+        EnrollEnrollsinfoExample example = new EnrollEnrollsinfoExample();
+        return enrollEnrollsinfoMapper.selectByExample(example.createCriteria().andProjectCodeEqualTo(projectCode).example());
+//        return enrollEnrollsinfoMapper.selectByExample(example);
     }
 }

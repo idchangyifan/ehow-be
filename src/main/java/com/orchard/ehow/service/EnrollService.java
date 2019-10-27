@@ -27,4 +27,6 @@ public interface EnrollService {
     List<EnrollProject> getAllProjects();
 
 
+    List<EnrollEnrollsinfo> getEnrollEnrollsinfoByProjectCode(String projectCode);
+
 }
