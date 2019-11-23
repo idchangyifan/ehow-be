@@ -1,9 +1,9 @@
 package com.orchard.ehow.dto;
 
 /**
- *@Author orchard.chang
- *@Date 2018/10/1810:10
- *@Version 1.0
+ * @Author orchard.chang
+ * @Date 2018/10/1810:10
+ * @Version 1.0
  **/
 public class UserInfoDto {
 
@@ -19,9 +19,38 @@ public class UserInfoDto {
 
     private String companyName;
 
-    private boolean rememberMe;
-
     private String email;
+
+    private String incorporator;
+
+    private String webSite;
+
+    private String companyAddress;
+
+
+    public String getIncorporator() {
+        return incorporator;
+    }
+
+    public void setIncorporator(String incorporator) {
+        this.incorporator = incorporator;
+    }
+
+    public String getWebSite() {
+        return webSite;
+    }
+
+    public void setWebSite(String webSite) {
+        this.webSite = webSite;
+    }
+
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
 
     public String getUserId() {
         return userId;
@@ -71,13 +100,6 @@ public class UserInfoDto {
         this.companyName = companyName;
     }
 
-    public boolean isRememberMe() {
-        return rememberMe;
-    }
-
-    public void setRememberMe(boolean rememberMe) {
-        this.rememberMe = rememberMe;
-    }
 
     public String getEmail() {
         return email;

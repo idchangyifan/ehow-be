@@ -48,10 +48,11 @@ public class AccountServiceImpl implements AccountService {
         BeanUtils.copyProperties(userInfoDto, userInfo);
         userInfo.setUserType(1);
         userInfo.setRegisterDate(LocalDate.now());
-
+        userInfo.setCompanyRegion(userInfoDto.getCompanyAddress());
         String salt = RandomStringUtils.randomAlphanumeric(10) + userInfo.getUserId();
         userInfo.setSalt(salt);
         userInfo.setPassword(new SimpleHash("MD5", userInfo.getPassword(), salt, 5).toString());
+        userInfo.setLeaderCode(UUID.randomUUID().toString());
         userInfoMapper.insert(userInfo);
         return true;
 
@@ -61,10 +62,10 @@ public class AccountServiceImpl implements AccountService {
     public boolean login(UserInfoDto userInfoDto) {
         String userId = userInfoDto.getUserId();
         String password = userInfoDto.getPassword();
-        boolean rememberMe = userInfoDto.isRememberMe();
+//        boolean rememberMe = userInfoDto.isRememberMe();
         Subject currentUser = SecurityUtils.getSubject();
         if (!currentUser.isAuthenticated()) {
-            UsernamePasswordToken token = new UsernamePasswordToken(userId, password, rememberMe);
+            UsernamePasswordToken token = new UsernamePasswordToken(userId, password);
             try {
                 //最终，会调用MyShiroRealm中override的doGetAuthenticationInfo方法
                 currentUser.login(token);
@@ -73,8 +74,9 @@ public class AccountServiceImpl implements AccountService {
                 throw new RuntimeException("账户或密码不正确");
             }
         }
-        UserInfo userInfo = (UserInfo)SecurityUtils.getSubject().getPrincipal();
-        logger.info(StrUtil.format("{}已经登录了！", userInfo.getContact()));
+        //若用户已经登录会返回false
+//        UserInfo userInfo = (UserInfo)SecurityUtils.getSubject().getPrincipal();
+//        logger.info(StrUtil.format("{}已经登录了！", userInfo.getContact()));
         return false;
     }
 
@@ -84,6 +86,6 @@ public class AccountServiceImpl implements AccountService {
     public UserInfo findByUserId(String userId) {
         UserInfoExample example = new UserInfoExample();
         example.createCriteria().andUserIdEqualTo(userId);
-        return userInfoMapper.selectByExample(example).get(0);
+        return userInfoMapper.selectByExample(example).stream().findFirst().orElse(null);
     }
 }

@@ -41,4 +41,11 @@ public class EnrollServiceImpl implements EnrollService {
         return enrollEnrollsinfoMapper.selectByExample(example.createCriteria().andProjectCodeEqualTo(projectCode).example());
 //        return enrollEnrollsinfoMapper.selectByExample(example);
     }
+
+    @Override
+    public EnrollEnrollsinfo findEnrollsInfoByUserIdAndProjectCode(String userId, String projectCode) {
+        EnrollEnrollsinfoExample example = new EnrollEnrollsinfoExample();
+        return enrollEnrollsinfoMapper.selectByExample(example.createCriteria().andProjectCodeEqualTo(projectCode)
+                .andUseridEqualTo(userId).example()).stream().findFirst().orElse(null);
+    }
 }

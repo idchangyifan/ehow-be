@@ -5,11 +5,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.metadata.WriteWorkbook;
 import com.google.common.collect.Lists;
-import com.orchard.ehow.dao.EnrollEnrollsinfo;
+import com.orchard.ehow.dao.*;
 import com.orchard.ehow.dto.DownloadData;
+import com.orchard.ehow.dto.Result;
+import com.orchard.ehow.dto.UnionType;
 import com.orchard.ehow.mapper.EnrollEnrollsinfoMapper;
+import com.orchard.ehow.mapper.EnrollProjectMapper;
 import com.orchard.ehow.service.EnrollService;
 import com.orchard.ehow.util.ResponseUtil;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.validation.annotation.Validated;
@@ -42,22 +49,60 @@ import java.util.List;
 public class EnrollApi {
     @Autowired
     EnrollService enrollService;
+    @Autowired
+    EnrollEnrollsinfoMapper mapper;
+    @Autowired
+    EnrollProjectMapper enrollProjectMapper;
 
+    @GetMapping("/findEnrollsInfoByUserIdAndProjectCode/{projectCode}")
+    public Result<EnrollEnrollsinfo> findEnrollsInfoByUserIdAndProjectCode(@PathVariable("projectCode") String projectCode) {
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        String userId = userInfo.getUserId();
+        return Result.success(enrollService.findEnrollsInfoByUserIdAndProjectCode(userId, projectCode));
+    }
 
+    /**
+     * saveOrUpdate
+     *
+     * @param enrollEnrollsinfo
+     * @return
+     */
     @PostMapping("/enroll")
-    Object enroll(@RequestBody EnrollEnrollsinfo enrollEnrollsinfo) {
+    public Object enroll(@RequestBody EnrollEnrollsinfo enrollEnrollsinfo) {
         LocalDateTime enrollDate = LocalDateTime.now();
         LocalDateTime expireDate = enrollEnrollsinfo.getExpireDate();
+        UserInfo userInfo = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        String userId = userInfo.getUserId();
         if (enrollDate.isAfter(expireDate)) {
             throw new RuntimeException("报名时间已截止！！");
         }
         enrollEnrollsinfo.setEnrollDate(enrollDate);
-        enrollService.enroll(enrollEnrollsinfo);
+        enrollEnrollsinfo.setCompanyName(userInfo.getCompanyName());
+        enrollEnrollsinfo.setRegionName(userInfo.getCompanyRegion());
+        enrollEnrollsinfo.setContact(userInfo.getContact());
+        enrollEnrollsinfo.setPhoneNumber(userInfo.getTelNumber());
+        enrollEnrollsinfo.setEmailAddress(userInfo.getEmail());
+        if (StringUtils.equals(UnionType.INDEPENDENCE.getUnionTypeCode(), enrollEnrollsinfo.getUnionTypeCode())) {
+            enrollEnrollsinfo.setUnionTypeName(UnionType.INDEPENDENCE.getUnionTypename());
+        } else if (StringUtils.equals(UnionType.AS_LEADER.getUnionTypeCode(), enrollEnrollsinfo.getUnionTypeCode())) {
+            enrollEnrollsinfo.setUnionTypeName(UnionType.AS_LEADER.getUnionTypename());
+        } else {
+            enrollEnrollsinfo.setUnionTypeName(UnionType.AS_FOLLOWER.getUnionTypename());
+        }
+        //因为userId只能由后台设置，所以前端若传过来了，说明是修改
+        if (StringUtils.isNotBlank(enrollEnrollsinfo.getUserid())) {
+            EnrollEnrollsinfoExample example = new EnrollEnrollsinfoExample();
+            example = example.createCriteria().andUseridEqualTo(userId).andProjectCodeEqualTo(enrollEnrollsinfo.getProjectCode()).example();
+            mapper.updateByExample(enrollEnrollsinfo, example);
+        } else {
+            enrollEnrollsinfo.setUserid(userId);
+            enrollService.enroll(enrollEnrollsinfo);
+        }
         return ResponseUtil.ok();
     }
 
     @GetMapping("/getProjectList")
-    Object getAllProjects() {
+    public Object getAllProjects() {
         return ResponseUtil.ok(CollectionUtil.reverse(CollectionUtil.sortByProperty(enrollService.getAllProjects(), "expireDate")));
     }
 
@@ -100,7 +145,7 @@ public class EnrollApi {
         }
     }
 
-    private void download(HttpServletResponse response) throws Exception{
+    private void download(HttpServletResponse response) throws Exception {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
         // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
@@ -124,6 +169,25 @@ public class EnrollApi {
             downloadDataList.add(downloadData);
         }
         EasyExcel.write(response.getOutputStream(), DownloadData.class).sheet("报名信息").doWrite(downloadDataList);
+    }
+
+    @GetMapping("getProjectByCode/{projectCode}")
+    public Result<EnrollProject> getProjectByCode(@PathVariable String projectCode) {
+        EnrollProjectExample example = new EnrollProjectExample();
+        example.createCriteria().andProjectCodeEqualTo(projectCode);
+        return Result.success(enrollProjectMapper.selectByExample(example).get(0));
+    }
+
+    @ApiOperation("检查所填写的牵头公司是否已经报名")
+    @GetMapping("/checkLeaderCodeExist/{leaderCode}")
+    public Result<?>  getLeaderCode(@PathVariable String leaderCode) {
+        EnrollEnrollsinfoExample example = new EnrollEnrollsinfoExample();
+        example.createCriteria().andLeaderCompanyIdEqualTo(leaderCode).andUnionTypeCodeEqualTo("1");
+        if (mapper.selectByExample(example).size() != 0) {
+            return Result.success();
+        } else {
+            throw new RuntimeException("牵头公司代码有误，请确保牵头公司已报名成功！");
+        }
     }
 
 }
