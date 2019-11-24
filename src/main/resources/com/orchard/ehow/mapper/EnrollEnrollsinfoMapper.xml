@@ -29,8 +29,10 @@
     <result column="member_award" jdbcType="VARCHAR" property="memberAward" />
     <result column="userId" jdbcType="VARCHAR" property="userid" />
     <result column="union_type_code" jdbcType="VARCHAR" property="unionTypeCode" />
-    <result column="LEADER_COMPANY_ID" jdbcType="VARCHAR" property="leaderCompanyId" />
     <result column="union_type_name" jdbcType="VARCHAR" property="unionTypeName" />
+    <result column="LEADER_COMPANY_ID" jdbcType="VARCHAR" property="leaderCompanyId" />
+    <result column="company_achievement" jdbcType="VARCHAR" property="companyAchievement" />
+    <result column="member_achievement" jdbcType="VARCHAR" property="memberAchievement" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <!--
@@ -107,7 +109,8 @@
     company_achievement5, company_achievement2, company_achievement1, email_address, 
     contact, phone_number, team_member, expire_date, enroll_date, member_achievement1, 
     member_achievement2, member_achievement3, member_achievement4, member_achievement5, 
-    member_award, userId, union_type_code, LEADER_COMPANY_ID, union_type_name
+    member_award, userId, union_type_code, union_type_name, LEADER_COMPANY_ID, company_achievement, 
+    member_achievement
   </sql>
   <select id="selectByExample" parameterType="com.orchard.ehow.dao.EnrollEnrollsinfoExample" resultMap="BaseResultMap">
     <!--
@@ -148,7 +151,8 @@
           company_achievement5, company_achievement2, company_achievement1, email_address, 
           contact, phone_number, team_member, expire_date, enroll_date, member_achievement1, 
           member_achievement2, member_achievement3, member_achievement4, member_achievement5, 
-          member_award, userId, union_type_code, LEADER_COMPANY_ID, union_type_name
+          member_award, userId, union_type_code, union_type_name, LEADER_COMPANY_ID, company_achievement, 
+          member_achievement
       </otherwise>
     </choose>
     from enroll_enrollsinfo
@@ -182,8 +186,8 @@
       enroll_date, member_achievement1, member_achievement2, 
       member_achievement3, member_achievement4, 
       member_achievement5, member_award, userId, 
-      union_type_code, LEADER_COMPANY_ID, union_type_name
-      )
+      union_type_code, union_type_name, LEADER_COMPANY_ID, 
+      company_achievement, member_achievement)
     values (#{projectName,jdbcType=VARCHAR}, #{projectCode,jdbcType=VARCHAR}, #{regionName,jdbcType=VARCHAR}, 
       #{companyName,jdbcType=VARCHAR}, #{companyAchievement3,jdbcType=VARCHAR}, #{companyAchievement4,jdbcType=VARCHAR}, 
       #{companyAchievement5,jdbcType=VARCHAR}, #{companyAchievement2,jdbcType=VARCHAR}, 
@@ -192,8 +196,8 @@
       #{enrollDate,jdbcType=TIMESTAMP}, #{memberAchievement1,jdbcType=VARCHAR}, #{memberAchievement2,jdbcType=VARCHAR}, 
       #{memberAchievement3,jdbcType=VARCHAR}, #{memberAchievement4,jdbcType=VARCHAR}, 
       #{memberAchievement5,jdbcType=VARCHAR}, #{memberAward,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, 
-      #{unionTypeCode,jdbcType=VARCHAR}, #{leaderCompanyId,jdbcType=VARCHAR}, #{unionTypeName,jdbcType=VARCHAR}
-      )
+      #{unionTypeCode,jdbcType=VARCHAR}, #{unionTypeName,jdbcType=VARCHAR}, #{leaderCompanyId,jdbcType=VARCHAR}, 
+      #{companyAchievement,jdbcType=VARCHAR}, #{memberAchievement,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.orchard.ehow.dao.EnrollEnrollsinfo">
     <!--
@@ -271,11 +275,17 @@
       <if test="unionTypeCode != null">
         union_type_code,
       </if>
+      <if test="unionTypeName != null">
+        union_type_name,
+      </if>
       <if test="leaderCompanyId != null">
         LEADER_COMPANY_ID,
       </if>
-      <if test="unionTypeName != null">
-        union_type_name,
+      <if test="companyAchievement != null">
+        company_achievement,
+      </if>
+      <if test="memberAchievement != null">
+        member_achievement,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -348,11 +358,17 @@
       <if test="unionTypeCode != null">
         #{unionTypeCode,jdbcType=VARCHAR},
       </if>
+      <if test="unionTypeName != null">
+        #{unionTypeName,jdbcType=VARCHAR},
+      </if>
       <if test="leaderCompanyId != null">
         #{leaderCompanyId,jdbcType=VARCHAR},
       </if>
-      <if test="unionTypeName != null">
-        #{unionTypeName,jdbcType=VARCHAR},
+      <if test="companyAchievement != null">
+        #{companyAchievement,jdbcType=VARCHAR},
+      </if>
+      <if test="memberAchievement != null">
+        #{memberAchievement,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -442,11 +458,17 @@
       <if test="record.unionTypeCode != null">
         union_type_code = #{record.unionTypeCode,jdbcType=VARCHAR},
       </if>
+      <if test="record.unionTypeName != null">
+        union_type_name = #{record.unionTypeName,jdbcType=VARCHAR},
+      </if>
       <if test="record.leaderCompanyId != null">
         LEADER_COMPANY_ID = #{record.leaderCompanyId,jdbcType=VARCHAR},
       </if>
-      <if test="record.unionTypeName != null">
-        union_type_name = #{record.unionTypeName,jdbcType=VARCHAR},
+      <if test="record.companyAchievement != null">
+        company_achievement = #{record.companyAchievement,jdbcType=VARCHAR},
+      </if>
+      <if test="record.memberAchievement != null">
+        member_achievement = #{record.memberAchievement,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -482,8 +504,10 @@
       member_award = #{record.memberAward,jdbcType=VARCHAR},
       userId = #{record.userid,jdbcType=VARCHAR},
       union_type_code = #{record.unionTypeCode,jdbcType=VARCHAR},
+      union_type_name = #{record.unionTypeName,jdbcType=VARCHAR},
       LEADER_COMPANY_ID = #{record.leaderCompanyId,jdbcType=VARCHAR},
-      union_type_name = #{record.unionTypeName,jdbcType=VARCHAR}
+      company_achievement = #{record.companyAchievement,jdbcType=VARCHAR},
+      member_achievement = #{record.memberAchievement,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -523,7 +547,8 @@
           company_achievement5, company_achievement2, company_achievement1, email_address, 
           contact, phone_number, team_member, expire_date, enroll_date, member_achievement1, 
           member_achievement2, member_achievement3, member_achievement4, member_achievement5, 
-          member_award, userId, union_type_code, LEADER_COMPANY_ID, union_type_name
+          member_award, userId, union_type_code, union_type_name, LEADER_COMPANY_ID, company_achievement, 
+          member_achievement
       </otherwise>
     </choose>
     from enroll_enrollsinfo

@@ -107,8 +107,8 @@ public class EnrollApi {
     }
 
 
-    @GetMapping("/download")
-    public void downloadWithAuth(HttpServletResponse response, HttpServletRequest request) throws Exception {
+    @GetMapping("/download/{projectCode}")
+    public void downloadWithAuth(HttpServletResponse response, HttpServletRequest request, @PathVariable String projectCode) throws Exception {
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
         String pass;
@@ -132,7 +132,7 @@ public class EnrollApi {
                 pass = userAndPass.split(":")[1];
                 if (user.equals("ehow") && pass.equals("ehowsz1234")) {
                     session.setAttribute("user", user);
-                    this.download(response);
+                    this.download(response,projectCode);
                 } else {
                     response.setStatus(401);
                     response.setHeader("WWW-authenticate", "Basic realm=\"请输入管理员密码\"");
@@ -141,17 +141,17 @@ public class EnrollApi {
                 ex.printStackTrace();
             }
         } else {
-            this.download(response);
+            this.download(response,projectCode);
         }
     }
 
-    private void download(HttpServletResponse response) throws Exception {
+    private void download(HttpServletResponse response, String projectCode) throws Exception {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
         // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
         String fileName = URLEncoder.encode("报名信息", "UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
-        List<EnrollEnrollsinfo> enrollEnrollsinfoList = enrollService.getEnrollEnrollsinfoByProjectCode("00003");
+        List<EnrollEnrollsinfo> enrollEnrollsinfoList = enrollService.getEnrollEnrollsinfoByProjectCode(projectCode);
         List<DownloadData> downloadDataList = Lists.newArrayList();
         for (EnrollEnrollsinfo enrollEnrollsinfo : enrollEnrollsinfoList) {
             DownloadData downloadData = new DownloadData();
