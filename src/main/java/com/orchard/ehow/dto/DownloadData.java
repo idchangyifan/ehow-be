@@ -19,6 +19,9 @@ public class DownloadData {
     @ExcelProperty("公司主要业绩")
     String companyAchievement;
 
+    @ExcelProperty("公司主要业绩(旧版)")
+    String companyAchievement2;
+
 
     @ExcelProperty("主创团队")
     String teamMember;
@@ -26,6 +29,8 @@ public class DownloadData {
     @ExcelProperty("主创业绩")
     String memberAchievement;
 
+    @ExcelProperty("主创业绩（旧版）")
+    String memberAchievement2;
 
     @ExcelProperty("主创获奖")
     String memberAward;
@@ -109,5 +114,21 @@ public class DownloadData {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public String getCompanyAchievement2() {
+        return companyAchievement2;
+    }
+
+    public void setCompanyAchievement2(String companyAchievement2) {
+        this.companyAchievement2 = companyAchievement2;
+    }
+
+    public String getMemberAchievement2() {
+        return memberAchievement2;
+    }
+
+    public void setMemberAchievement2(String memberAchievement2) {
+        this.memberAchievement2 = memberAchievement2;
     }
 }

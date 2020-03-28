@@ -156,16 +156,17 @@ public class EnrollApi {
         for (EnrollEnrollsinfo enrollEnrollsinfo : enrollEnrollsinfoList) {
             DownloadData downloadData = new DownloadData();
             BeanUtil.copyProperties(enrollEnrollsinfo, downloadData);
-            downloadData.setMemberAchievement(enrollEnrollsinfo.getMemberAchievement1() + "/n" +
+            downloadData.setMemberAchievement2(enrollEnrollsinfo.getMemberAchievement1() + "/n" +
                     enrollEnrollsinfo.getMemberAchievement2() + "/n" +
                     enrollEnrollsinfo.getMemberAchievement3() + "/n" +
                     enrollEnrollsinfo.getMemberAchievement4() + "/n" +
                     enrollEnrollsinfo.getMemberAchievement5() + "/n");
-            downloadData.setCompanyAchievement(enrollEnrollsinfo.getCompanyAchievement1() + "/n" +
+            downloadData.setCompanyAchievement2(enrollEnrollsinfo.getCompanyAchievement1() + "/n" +
                     enrollEnrollsinfo.getCompanyAchievement2() + "/n" +
                     enrollEnrollsinfo.getCompanyAchievement3() + "/n" +
                     enrollEnrollsinfo.getCompanyAchievement4() + "/n" +
                     enrollEnrollsinfo.getCompanyAchievement5() + "/n");
+
             downloadDataList.add(downloadData);
         }
         EasyExcel.write(response.getOutputStream(), DownloadData.class).sheet("报名信息").doWrite(downloadDataList);
